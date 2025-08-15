@@ -3,71 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>校長藏書</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>校長藏書 | 數位圖書館</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00f7ff;
+            --secondary: #0066ff;
+            --dark: #0a0a1a;
+            --light: #e0f8ff;
+            --glow: 0 0 10px rgba(0, 247, 255, 0.7);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 103, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 242, 0.15) 0%, transparent 50%);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: rgba(10, 10, 30, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 247, 255, 0.3);
+            box-shadow: var(--glow);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: var(--glow);
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            animation: pulse 2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { opacity: 0.7; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.1); }
+        }
+        
+        .search-container {
+            display: flex;
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+        
+        .search-bar {
+            flex: 1;
+            padding: 1rem;
+            font-size: 1rem;
+            background: rgba(20, 20, 40, 0.7);
+            border: 1px solid rgba(0, 247, 255, 0.3);
+            border-radius: 50px 0 0 50px;
+            color: var(--light);
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .search-bar:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.5);
+        }
+        
+        .search-btn {
+            padding: 0 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            border: none;
+            border-radius: 0 50px 50px 0;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.5);
+        }
+        
+        .bookshelf {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .book {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 247, 255, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .book:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 247, 255, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .book-cover {
+            height: 300px;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .book:hover .book-cover img {
+            transform: scale(1.05);
+        }
+        
+        .book-cover .default-cover {
+            width: 60%;
+            height: 60%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        
+        .book-info {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .book-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--primary);
+        }
+        
+        .book-info p {
+            color: rgba(224, 248, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .book-badge {
+            position: absolute;
+            top: -280px;
+            right: 15px;
+            background: var(--primary);
+            color: var(--dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: var(--glow);
+        }
+        
+        .preview-btn {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        .preview-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+        
+        .open-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .open-btn:hover {
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.7);
+        }
+        
+        .no-books {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: rgba(224, 248, 255, 0.5);
+        }
+        
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.95);
+            z-index: 1000;
+            overflow: auto;
+            padding: 2rem;
+        }
+        
+        .preview-content {
+            background: var(--dark);
+            margin: 0 auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 10px;
+            position: relative;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.5);
+        }
+        
+        .preview-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            z-index: 1001;
+            background: rgba(10, 10, 30, 0.7);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .preview-close:hover {
+            transform: rotate(90deg);
+            color: #ff0000;
+        }
+        
+        .preview-iframe {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+        
+        .preview-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .preview-actions button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .open-full {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+        }
+        
+        .open-full:hover {
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.7);
+        }
+        
+        .close-preview {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .close-preview:hover {
+            background: rgba(0, 247, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .bookshelf {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .search-container {
+                margin: 1rem;
+            }
+            
+            .preview-modal {
+                padding: 1rem;
+            }
+            
+            .preview-content {
+                width: 95%;
+                padding: 1rem;
+            }
+            
+            .preview-iframe {
+                height: 60vh;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>校長藏書</h1>
-        <nav>
-            <button id="view-library-btn">圖書館</button>
-            <button id="view-backstage-btn" class="admin-btn">管理書籍</button>
-        </nav>
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <h1>校長藏書</h1>
+        </div>
+        <div class="stats">
+            <span id="book-count">0</span> 冊藏書
+        </div>
     </header>
 
     <main>
-        <!-- Library View -->
-        <section id="library-view" class="active-view">
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="搜索書籍...">
-                <button id="search-btn"><i class="fas fa-search"></i></button>
-            </div>
-            <div id="bookshelf" class="bookshelf">
-                <!-- Books will be displayed here -->
-            </div>
-        </section>
+        <div class="search-container">
+            <input type="text" class="search-bar" id="search-input" placeholder="輸入關鍵字搜索...">
+            <button class="search-btn" id="search-btn"><i class="fas fa-search"></i> 搜索</button>
+        </div>
 
-        <!-- Backstage View -->
-        <section id="backstage-view">
-            <h2>書籍管理</h2>
-            <form id="book-upload-form">
-                <div class="form-group">
-                    <label for="book-title">書名:</label>
-                    <input type="text" id="book-title" required>
-                </div>
-                <div class="form-group">
-                    <label for="book-description">描述:</label>
-                    <textarea id="book-description" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="book-cover">封面圖片:</label>
-                    <input type="file" id="book-cover" accept="image/*">
-                </div>
-                <div class="form-group">
-                    <label for="book-file">PDF文件:</label>
-                    <input type="file" id="book-file" accept=".pdf" required>
-                </div>
-                <button type="submit">上傳書籍</button>
-            </form>
+        <div id="bookshelf" class="bookshelf">
+            <!-- Books will be dynamically inserted here -->
+        </div>
 
-            <div id="uploaded-books">
-                <h3>已上傳書籍</h3>
-                <div id="uploaded-books-list">
-                    <!-- Uploaded books will be listed here -->
+        <!-- Preview Modal -->
+        <div id="preview-modal" class="preview-modal">
+            <div class="preview-content">
+                <span class="preview-close">&times;</span>
+                <h2 id="preview-title"></h2>
+                <iframe id="preview-iframe" class="preview-iframe" frameborder="0"></iframe>
+                <div class="preview-actions">
+                    <button class="close-preview">關閉預覽</button>
+                    <button class="open-full">在新頁面打開</button>
                 </div>
-            </div>
-        </section>
-
-        <!-- PDF Viewer Modal -->
-        <div id="pdf-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <iframe id="pdf-viewer" frameborder="0"></iframe>
             </div>
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample books data
+            const books = [
+                {
+                    id: '1',
+                    title: 'C++ How to Program 7th Edition.2010.英文版',
+                    description: '這是一本關於C++編程的經典教材，涵蓋了從基礎到進階的各種主題，適合初學者和有經驗的開發者。',
+                    coverUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjHyaGWQgA6lHSYxlGHDdZAtSZ0y_FcK71dQ&s',
+                    pdfUrl: '/Users/gordonchiu/Desktop/library/library/[C++ How to Program 7th Edition].2010.英文版.pdf',
+                    category: '科技'
+                },
+                {
+                    id: '2',
+                    title: '生物統計Fundamentals of Biostatistics',
+                    description: '這本書介紹了生物統計學的基本原理和方法，適合醫學和公共衛生領域的研究人員。',
+                    coverUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTa4hNXjXBsl0OYXMMjt2sPv3MmokXIIDnHhQ&s',
+                    pdfUrl: '/Users/gordonchiu/Desktop/library/library/fundamentals-of-biostatistics_compress.pdf',
+                    category: '統計'
+                },
+                {
+                    id: '3',
+                    title: '微積分Biocalculus Calculus, Probability, and for the Life Sciences (James Stewart, Troy Day) (z-lib.org).pdf',
+                    description: '這本書專為生命科學領域設計，結合了微積分和概率論的基本概念，適合生物學和醫學學生。',
+                    coverUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS15jAzGxIiGEUXmSlut8eDcq3-BEk86T2jBtDTUVyUBm4jkmNNl4Cmeb_7ykERtrOVcLw&usqp=CAU',
+                    pdfUrl: '/Users/gordonchiu/Desktop/library/library/微積分Biocalculus Calculus, Probability, and for the Life Sciences (James Stewart, Troy Day) (z-lib.org).pdf',
+                    category: '科學'
+                },
+                {
+                    id: '4',
+                    title: '神經網絡深度學習',
+                    description: '全面介紹深度學習技術，包含實用案例和代碼示例，適合AI研究者與開發者。',
+                    coverUrl: '',
+                    pdfUrl: 'sample.pdf',
+                    category: '技術'
+                },
+                {
+                    id: '5',
+                    title: '太空探索新紀元',
+                    description: '探討人類在火星殖民、小行星採礦和星際旅行方面的最新進展與未來計劃。',
+                    coverUrl: 'https://example.com/space-exploration.jpg',
+                    pdfUrl: 'sample.pdf',
+                    category: '科學'
+                },
+                {
+                    id: '6',
+                    title: '區塊鏈革命',
+                    description: '詳細解析區塊鏈技術如何重塑金融、供應鏈和數字身份認證系統。',
+                    coverUrl: '',
+                    pdfUrl: 'sample.pdf',
+                    category: '科技'
+                }
+            
+            ];
+
+            // Update book count
+            document.getElementById('book-count').textContent = books.length;
+
+            // Preview Modal Elements
+            const previewModal = document.getElementById('preview-modal');
+            const previewIframe = document.getElementById('preview-iframe');
+            const previewTitle = document.getElementById('preview-title');
+            const previewClose = document.querySelector('.preview-close');
+            const closePreviewBtn = document.querySelector('.close-preview');
+            const openFullBtn = document.querySelector('.open-full');
+            
+            let currentPdfUrl = '';
+
+            // Open preview modal
+            function openPreview(pdfUrl, title) {
+                currentPdfUrl = pdfUrl;
+                previewTitle.textContent = title;
+                previewIframe.src = pdfUrl;
+                previewModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Close preview modal
+            function closePreview() {
+                previewModal.style.display = 'none';
+                previewIframe.src = '';
+                document.body.style.overflow = 'auto';
+            }
+
+            // Event listeners for preview modal
+            previewClose.addEventListener('click', closePreview);
+            closePreviewBtn.addEventListener('click', closePreview);
+            
+            // Open in new tab
+            openFullBtn.addEventListener('click', function() {
+                window.open(currentPdfUrl, '_blank');
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === previewModal) {
+                    closePreview();
+                }
+            });
+
+            // Render bookshelf
+            function renderBookshelf(filter = '') {
+                const bookshelf = document.getElementById('bookshelf');
+                bookshelf.innerHTML = '';
+                
+                const filteredBooks = books.filter(book => 
+                    book.title.toLowerCase().includes(filter.toLowerCase()) || 
+                    book.description.toLowerCase().includes(filter.toLowerCase())
+                );
+                
+                if (filteredBooks.length === 0) {
+                    bookshelf.innerHTML = '<p class="no-books">未找到匹配的書籍，請嘗試其他搜索關鍵詞。</p>';
+                    return;
+                }
+                
+                filteredBooks.forEach(book => {
+                    const bookElement = document.createElement('div');
+                    bookElement.className = 'book';
+                    bookElement.innerHTML = `
+                        <div class="book-cover">
+                            ${book.coverUrl ? 
+                                `<img src="${book.coverUrl}" alt="${book.title}">` : 
+                                `<div class="default-cover">${book.title.charAt(0)}</div>`
+                            }
+                            <button class="preview-btn"><i class="fas fa-eye"></i> 預覽</button>
+                            <button class="open-btn"><i class="fas fa-external-link-alt"></i> 打開</button>
+                        </div>
+                        <div class="book-info">
+                            <div class="book-badge">${book.category}</div>
+                            <h3>${book.title}</h3>
+                            <p>${book.description}</p>
+                        </div>
+                    `;
+                    
+                    // Add event listeners to buttons
+                    bookElement.querySelector('.preview-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openPreview(book.pdfUrl, book.title);
+                    });
+                    
+                    bookElement.querySelector('.open-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        window.open(book.pdfUrl, '_blank');
+                    });
+                    
+                    bookshelf.appendChild(bookElement);
+                });
+            }
+
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            
+            searchBtn.addEventListener('click', () => {
+                renderBookshelf(searchInput.value);
+            });
+            
+            searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    renderBookshelf(searchInput.value);
+                }
+            });
+
+            // Initial render
+            renderBookshelf();
+        });
+    </script>
 </body>
 </html>
