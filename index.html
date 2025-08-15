@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校長藏書</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>校長藏書</h1>
+        <nav>
+            <button id="view-library-btn">圖書館</button>
+            <button id="view-backstage-btn" class="admin-btn">管理書籍</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Library View -->
+        <section id="library-view" class="active-view">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="搜索書籍...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <div id="bookshelf" class="bookshelf">
+                <!-- Books will be displayed here -->
+            </div>
+        </section>
+
+        <!-- Backstage View -->
+        <section id="backstage-view">
+            <h2>書籍管理</h2>
+            <form id="book-upload-form">
+                <div class="form-group">
+                    <label for="book-title">書名:</label>
+                    <input type="text" id="book-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="book-description">描述:</label>
+                    <textarea id="book-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="book-cover">封面圖片:</label>
+                    <input type="file" id="book-cover" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="book-file">PDF文件:</label>
+                    <input type="file" id="book-file" accept=".pdf" required>
+                </div>
+                <button type="submit">上傳書籍</button>
+            </form>
+
+            <div id="uploaded-books">
+                <h3>已上傳書籍</h3>
+                <div id="uploaded-books-list">
+                    <!-- Uploaded books will be listed here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- PDF Viewer Modal -->
+        <div id="pdf-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <iframe id="pdf-viewer" frameborder="0"></iframe>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
